@@ -1,0 +1,9 @@
+package com.myweb.www.repository;
+
+import com.myweb.www.domain.LevelUpVO;
+
+public interface LevelUpDAO {
+
+	int register(LevelUpVO lvo);
+
+}

@@ -1,0 +1,24 @@
+package com.myweb.www.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.myweb.www.service.UserService;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@RequestMapping("/levelUp/*")
+@Controller
+public class LevelUpController {
+	
+	@Autowired
+	UserService usv;
+	
+	@GetMapping("/register")
+	public String getLevelUp() {
+		return "";
+	}
+}

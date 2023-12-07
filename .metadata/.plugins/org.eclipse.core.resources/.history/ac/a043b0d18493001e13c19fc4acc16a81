@@ -1,0 +1,90 @@
+function editAccount() {
+  var editAccountModal = document.getElementById("editAccountModal");
+  editAccountModal.style.display =
+    editAccountModal.style.display === "block" ? "none" : "block";
+}
+
+document.getElementById("nav-close-button").addEventListener("click", () => {
+  var editAccountModal = document.getElementById("editAccountModal");
+  editAccountModal.style.display = "none";
+});
+
+function toggleSearch() {
+  var searchIcon = document.getElementById("search");
+  var searchInput = document.getElementById("searchInput");
+  var searchField = document.getElementById("searchField");
+
+  searchIcon.style.display = "none";
+  searchInput.style.display = "block";
+  searchField.focus();
+}
+
+function cancelSearch() {
+  var searchIcon = document.getElementById("search");
+  var searchInput = document.getElementById("searchInput");
+
+  searchInput.style.display = "none";
+  searchIcon.style.display = "block";
+}
+
+// Web Socket
+const alarmDiv = document.querySelector("#alarmDiv");
+const alarmI = document.querySelector("#alarmI");
+const alarmUl = document.querySelector("#alarmUl");
+
+var websocket;
+
+$(document).ready(function () {
+  connect();
+});
+
+function connect() {
+  var ws = new SockJS("${pageContext.request.contextPath}/echo");
+  sock = ws;
+
+  ws.onopen = function () {
+    console.log("연결완료");
+    ws.send($("#socketuserID").val());
+  };
+
+  ws.onmessage = function (event) {
+    /* 받을 알람이 있을 때 */
+    console.log(event.data);
+    if (event.data.length > 0) {
+      let newAlarm = "";
+      newAlarm += '<li scope="col">' + event.data + "</li>";
+      $("#alarmUl").append(newAlarm);
+      alarmDiv.style.visibility = "visible";
+    }
+  };
+
+  ws.onclose = function () {
+    console.log("close");
+  };
+}
+
+/* 알람창 추가 */
+
+alarmI.addEventListener("click", function () {
+  alarmUl.classList.toggle("visible");
+  $(this).stop(false, false);
+});
+
+alarmUl.addEventListener("click", function (e) {
+  var id = "${ses.id}";
+  console.log("id: " + id);
+  $.ajax({
+    url: "/levelUp/delete",
+    data: { id: id },
+    type: "get",
+    success: function (data) {
+      console.log(data);
+      alert("성공");
+    },
+  });
+
+  $(e.target).remove();
+  if (alarmUl.children.length == 0) {
+    alarmDiv.style.visibility = "hidden";
+  }
+});

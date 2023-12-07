@@ -1,0 +1,23 @@
+package com.myweb.www.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.myweb.www.domain.LevelUpVO;
+import com.myweb.www.repository.LevelUpDAO;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Service
+public class LevelUpServiceImpl implements LevelUpService {
+	
+	@Autowired
+	private LevelUpDAO ldao;
+
+	@Override
+	public int register(LevelUpVO lvo) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+}

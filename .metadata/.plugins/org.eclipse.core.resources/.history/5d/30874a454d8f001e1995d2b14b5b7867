@@ -1,0 +1,211 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ page session="true"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<title>부동산 코리아</title>
+<!-- CSS import -->
+<link rel="stylesheet" href="/resources/css/navigation.css" />
+<link rel="stylesheet" href="/resources/css/footer.css" />
+<link rel="stylesheet" href="/resources/css/chatbot/chatbot.css" />
+<link rel="stylesheet" href="/resources/css/home.css" />
+<!-- JS import -->
+<script defer type="text/javascript"
+	src="/resources/js/chatbot/chatbot.js"></script>
+<!-- SweetAlert2 -->
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- jquery import -->
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+	<!-- navigation -->
+	<jsp:include page="./layouts/navigation.jsp"></jsp:include>
+	<div style="margin-top: 12rem">
+		<h1>Hello world!</h1>
+		<P>The time on the server is ${serverTime}.</P>
+	</div>
+
+	<!-- main -->
+	<main>
+		<!-- 영상 or CF광고 -->
+		<div class="video-box">
+			<video src="/resources/video/skyscraper.mp4" muted autoplay loop>
+				<source src="/resources/video/skyscraper.mp4" type="video/mp4">
+			</video>
+		</div>
+		<!-- 슬라이드 메뉴 -->
+		<section id="tranding">
+			<div class="container2">
+				<h3 class="text-center section-subheading">- popular products -</h3>
+				<h1 class="text-center section-heading">Tranding products</h1>
+			</div>
+			<div class="container2">
+				<div class="swiper tranding-slider">
+					<div class="swiper-wrapper">
+						<!-- Slide-start -->
+						<div class="swiper-slide tranding-slide">
+							<div class="tranding-slide-img">
+								<img src="/resources/img/정수기.jpg" alt="Tranding" />
+							</div>
+							<div class="tranding-slide-content">
+								<h1 class="food-price">₩ 1,040,000</h1>
+								<div class="tranding-slide-content-bottom">
+									<h2 class="food-name">water purifier</h2>
+								</div>
+							</div>
+						</div>
+						<!-- Slide-end -->
+						<!-- Slide-start -->
+						<div class="swiper-slide tranding-slide">
+							<div class="tranding-slide-img">
+								<img src="/resources/img/공기청정기.jpg" alt="Tranding" />
+							</div>
+							<div class="tranding-slide-content">
+								<h1 class="food-price">₩ 547,710</h1>
+								<div class="tranding-slide-content-bottom">
+									<h2 class="food-name" style="color: white">air purifier</h2>
+								</div>
+							</div>
+						</div>
+						<!-- Slide-end -->
+						<!-- Slide-start -->
+						<div class="swiper-slide tranding-slide">
+							<div class="tranding-slide-img">
+								<img src="/resources/img/매트리스.jpg" alt="Tranding" />
+							</div>
+							<div class="tranding-slide-content">
+								<h1 class="food-price">₩ 498,000</h1>
+								<div class="tranding-slide-content-bottom">
+									<h2 class="food-name" style="color: white">mattress</h2>
+								</div>
+							</div>
+						</div>
+						<!-- Slide-end -->
+						<!-- Slide-start -->
+						<div class="swiper-slide tranding-slide">
+							<div class="tranding-slide-img">
+								<img src="/resources/img/식기세척기.jpg" alt="Tranding" />
+							</div>
+							<div class="tranding-slide-content">
+								<h1 class="food-price">₩ 1,070,550</h1>
+								<div class="tranding-slide-content-bottom">
+									<h2 class="food-name" style="color: white">dishwasher</h2>
+								</div>
+							</div>
+						</div>
+						<!-- Slide-end -->
+						<!-- Slide-start -->
+						<div class="swiper-slide tranding-slide">
+							<div class="tranding-slide-img">
+								<img src="/resources/img/무선청소기.jpg" alt="Tranding" />
+							</div>
+							<div class="tranding-slide-content">
+								<h1 class="food-price">₩ 990,000</h1>
+								<div class="tranding-slide-content-bottom">
+									<h2 class="food-name" style="color: white">wireless vacuum
+										cleaner</h2>
+								</div>
+							</div>
+						</div>
+						<!-- Slide-end -->
+						<!-- Slide-start -->
+						<div class="swiper-slide tranding-slide">
+							<div class="tranding-slide-img">
+								<img src="/resources/img/로봇청소기.jpg" alt="Tranding" />
+							</div>
+							<div class="tranding-slide-content">
+								<h1 class="food-price">₩ 2,306,000</h1>
+								<div class="tranding-slide-content-bottom">
+									<h2 class="food-name" style="color: white">robot vacuum
+										cleaner</h2>
+								</div>
+							</div>
+						</div>
+						<!-- Slide-end -->
+						<!-- Slide-start -->
+						<div class="swiper-slide tranding-slide">
+							<div class="tranding-slide-img">
+								<img src="/resources/img/밥솥.jpg" alt="Tranding" />
+							</div>
+							<div class="tranding-slide-content">
+								<h1 class="food-price">₩ 508,630</h1>
+								<div class="tranding-slide-content-bottom">
+									<h2 class="food-name" style="color: white">Rice cooker</h2>
+								</div>
+							</div>
+						</div>
+						<!-- Slide-end -->
+					</div>
+
+					<div class="tranding-slider-control">
+						<div class="swiper-button-prev slider-arrow">
+							<ion-icon name="arrow-back-outline"></ion-icon>
+						</div>
+						<div class="swiper-button-next slider-arrow">
+							<ion-icon name="arrow-forward-outline"></ion-icon>
+						</div>
+						<div class="swiper-pagination"></div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- 플로팅 메뉴 or 퀵메뉴 -->
+		<div class="floating">
+			<button id="info-button">
+				<i class="fa-solid fa-question" style="color: white"></i>
+			</button>
+			<div id="info-modal" class="modal">
+				<div id="modal-header"
+					style="display: flex; justify-content: center; align-items: center">
+					<img class="robot-icon2" alt="robot-icon"
+						src="/resources/image/icon_robot.png" /> <span>챗봇
+						서비스</span> <span id="close-button">&times;</span>
+				</div>
+				<div id="wrap">
+					<!-- 응답 메시지 출력  -->
+					<div id="chatBox"></div>
+
+					<!-- 질문 메시지 입력 폼 -->
+					<form id="chatForm"
+						style="display: flex; border: none; width: 100%">
+						<input type="text" id="message" name="message" size="30"
+							placeholder="질문을 입력하세요" /> <input type="submit"
+							value="전송" />
+					</form>
+				</div>
+			</div>
+		</div>
+	</main>
+
+	<!-- footer -->
+	<script type="text/javascript">
+		// 회원 가입
+		const msg_signUp = `<c:out value="${msg_signUp}"/>`;
+		if (msg_signUp == 1) {
+			Swal.fire("Success", "회원 가입을 축하드립니다.", "success");
+		}
+		// 정보 수정
+		const msg_editAccount = `<c:out value="${msg_editAccount}"/>`;
+		if (msg_editAccount == 1) {
+			Swal.fire("Success", "성공적으로 회원님의 정보가 수정되었습니다.", "success");
+		}
+		// 로그인
+		const loginSuccess = `<c:out value="${loginSuccess}"/>`;
+		if (loginSuccess == 1) {
+			Swal.fire("환영합니다!", "${name}님 ${email}으로 로그인 하셨습니다.", "success");
+		}
+		// 게시글 등록 권한
+		const notRegister = `<c:out value="${notRegister}"/>`;
+		console.log(notRegister);
+		if (notRegister == 1) {
+			Swal.fire("Error", "게시글 등록 권한이 없습니다.", "error");
+		}
+	</script>
+	<jsp:include page="./layouts/footer.jsp"></jsp:include>
+</body>
+</html>

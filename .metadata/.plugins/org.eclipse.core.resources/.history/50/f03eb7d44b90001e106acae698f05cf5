@@ -1,0 +1,51 @@
+// 모달 창 열고 닫기
+document.addEventListener('DOMContentLoaded', function() {
+   	var confirmationModal = document.getElementById("confirmationModal");
+	var lvoTrButton = document.getElementById("lvoTr");
+	var closeButton = document.getElementById("close-button");
+	var cancelAction = document.getElementById("cancelAction");
+	
+	lvoTrButton.addEventListener('click', function() {
+	    confirmationModal.style.display = "block";
+	});
+	
+	closeButton.addEventListener('click', function() {
+	    confirmationModal.style.display = "none";
+	});
+	
+	cancelAction.addEventListener('click', function() {
+	    confirmationModal.style.display = "none";
+	});
+	
+	window.addEventListener('click', function(event) {
+	    if (event.target === confirmationModal) {
+	        confirmationModal.style.display = "none";
+	    }
+	});
+});
+
+document.getElementById("confirmAction").addEventListener("click", function() {
+  const lno = "${lvo.lno}";
+  const id = "${lvo.id}";
+ 
+  console.log("lno: " + lno);
+  console.log("id: " + id);
+  
+  // AJAX 요청 보내기
+  $.ajax({
+    type: "POST",
+    url: "/levelUp/proceeding",
+    data: {
+      "lno": lno,
+      "id": id,
+    },
+    success: function (data) {
+      // 성공적으로 처리된 경우의 로직
+      console.log("AJAX 요청 성공:", data);
+    },
+    error: function (xhr, status, error) {
+      // 에러 처리 로직
+      console.error("AJAX 요청 에러:", error);
+    }
+  });
+});

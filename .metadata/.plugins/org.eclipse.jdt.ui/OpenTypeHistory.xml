@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<typeInfoHistroy>
+    <typeInfo handle="=springproject/C:\/Program Files\/Java\/jdk-11\/lib\/jrt-fs.jar`java.base=/maven.pomderived=/true=/=/javadoc_location=/https:\/\/docs.oracle.com\/en\/java\/javase\/11\/docs\/api\/=/&lt;java.nio.file.attribute(UserDefinedFileAttributeView.class[UserDefinedFileAttributeView" modifiers="1537" timestamp="1697694652567"/>
+    <typeInfo handle="=springproject/src\/main\/java=/optional=/true=/=/maven.pomderived=/true=/&lt;com.myweb.www.service{UserService.java[UserService" modifiers="513" timestamp="1699244412380"/>
+    <typeInfo handle="=springproject/C:\/Program Files\/Java\/jdk-11\/lib\/jrt-fs.jar`java.base=/maven.pomderived=/true=/=/javadoc_location=/https:\/\/docs.oracle.com\/en\/java\/javase\/11\/docs\/api\/=/&lt;java.nio.file.attribute(UserPrincipal.class[UserPrincipal" modifiers="1537" timestamp="1697694652567"/>
+    <typeInfo handle="=springproject/src\/main\/java=/optional=/true=/=/maven.pomderived=/true=/&lt;com.myweb.www.service{BoardService.java[BoardService" modifiers="513" timestamp="1701674339657"/>
+    <typeInfo handle="=springproject/src\/main\/java=/optional=/true=/=/maven.pomderived=/true=/&lt;com.myweb.www.service{CommentService.java[CommentService" modifiers="513" timestamp="1701242552814"/>
+    <typeInfo handle="=springproject/C:\/Program Files\/Java\/jdk-11\/lib\/jrt-fs.jar`java.xml=/maven.pomderived=/true=/=/javadoc_location=/https:\/\/docs.oracle.com\/en\/java\/javase\/11\/docs\/api\/=/&lt;javax.xml.stream.events(Comment.class[Comment" modifiers="1537" timestamp="1697694652567"/>
+    <typeInfo handle="=springproject/src\/main\/java=/optional=/true=/=/maven.pomderived=/true=/&lt;com.myweb.www.service{LevelUpService.java[LevelUpService" modifiers="513" timestamp="1701801207823"/>
+</typeInfoHistroy>

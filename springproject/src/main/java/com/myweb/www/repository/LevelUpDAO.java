@@ -1,0 +1,18 @@
+package com.myweb.www.repository;
+
+import java.util.List;
+
+import com.myweb.www.domain.LevelUpVO;
+import com.myweb.www.domain.PagingVO;
+
+public interface LevelUpDAO {
+
+	int register(LevelUpVO lvo);
+
+	List<LevelUpVO> getList(PagingVO pvo);
+
+	int updateConfirm(int lno);
+
+	int getTotalCount();
+
+}

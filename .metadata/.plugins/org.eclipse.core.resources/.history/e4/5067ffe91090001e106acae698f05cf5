@@ -1,0 +1,65 @@
+project name: springproject
+id: springuser
+pw: sys1234
+
+2023-10-23 -> 2023-10-25 수정
+create table user(
+id varchar(100) not null,
+pw varchar(100) not null,
+name varchar(100) not null,
+address_postcode varchar(100) not null,
+address_primary varchar(100) not null,
+address_detail varchar(100),
+phone varchar(100) not null,
+email varchar(100) not null,
+customerType varchar(10) not null,
+reg_date datetime default now(),
+primary key(id))
+
+2023-11-10
+create table board(
+bno int not null auto_increment,
+title varchar(20),
+writer varchar(10),
+content text,
+reg_date datetime default now(),
+read_count int default 0,
+searchType_a varchar(10),
+searchType_b varchar(10),
+searchType_add1 varchar(10),
+searchType_add2 varchar(10),
+primary key(bno))
+
+2023-11-14
+create table file(
+uuid varchar(256) not null,
+save_dir varchar(256) not null,
+file_name varchar(256) not null,
+file_type tinyint(1) default 0,
+file_size int,
+bno int,
+fileCategoryNum int,
+primary key(uuid))
+
+2023-11-20
+create table comment(
+cno int not null auto_increment,
+bno int not null,
+writer varchar(100) not null,
+content text,
+reg_date datetime default now(),
+mod_date datetime default now(),
+rate int FLOAT null,
+primary key(cno))
+
+create table levelUp(
+lno int auto_increment not null,
+id varchar(100),
+phone varchar(100),
+businessNumber varchar(100),
+content text,
+date datetime default current_timestamp,
+
+
+checked varchar(10) default "n",
+primary key(csno));

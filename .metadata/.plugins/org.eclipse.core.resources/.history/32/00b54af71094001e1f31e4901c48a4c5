@@ -1,0 +1,101 @@
+package com.myweb.www.handler;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.servlet.http.HttpSession;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.socket.CloseStatus;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketHandler;
+import org.springframework.web.socket.WebSocketSession;
+import org.springframework.web.socket.handler.TextWebSocketHandler;
+
+import com.myweb.www.domain.UserVO;
+
+@Component
+@RequestMapping("/echo")
+public class EchoHandler extends TextWebSocketHandler{
+	private static final Logger logger = LoggerFactory.getLogger(WebSocketHandler.class);
+	
+	private List<WebSocketSession> sessions = new ArrayList<WebSocketSession>();
+	
+	// 클라이언트가 서버로 연결시 웹 소켓 생성
+	@Override
+	public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+		logger.info("Socket 연결");
+		//웹 소켓이 생성될 때마다 리스트에 넣어줌
+		sessions.add(session);
+	}
+	
+	//JS에서 메세지 받을 때
+	@Override
+	protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+	    for (WebSocketSession single : sessions) {
+	        HttpSession httpSession = (HttpSession) single.getAttributes().get(HttpSession.class.getName());
+	        UserVO userVO = (UserVO) httpSession.getAttribute("ses");
+	        String userId;
+	        if (userVO != null) {
+	            // Access the id from UserVO
+	            userId = userVO.getId();
+	            // Now you can use userId as needed
+	            logger.info("WebSocketSession id: {}", userId);
+	        } else {
+	            logger.warn("UserVO not found in session for WebSocketSession.");
+	        }
+
+	        String msg = message.getPayload();
+	        if (msg != null) {
+	            String[] strs = msg.split(",");
+	            logger.info(Arrays.toString(strs)); // Use Arrays.toString(strs)
+
+	            if (strs != null && strs.length == 2) {
+	                String server = strs[0]; // 관리자
+	                String id = strs[1]; // m_id 저장
+	                if (userId != null && userId.equals(id)) { // Check userId for null
+	                    TextMessage sendMsg = new TextMessage(server + "가 신청자 " + id + "님의 등업을 완료하였습니다.");
+	                    single.sendMessage(sendMsg);
+	                }
+	            }
+	        }
+	    }
+	}
+
+	// 연결 해제될 때
+	@Override
+	public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+		String senderId = getMemberId(session);
+		if(senderId!=null) {	// 로그인 값이 있는 경우만
+			log(senderId + " 연결 종료됨");
+			users.remove(senderId);
+			// sessions.remove(session);
+		}
+	}
+	
+	// 에러 발생시
+	@Override
+	public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
+		log(session.getId() + " 익셉션 발생: " + exception.getMessage());
+
+	}
+	
+	// 로그 메시지
+	private void log(String logmsg) {
+		System.out.println(new Date() + " : " + logmsg);
+	}
+	
+	// 웹소켓에 id 가져오기
+    // 접속한 유저의 http세션을 조회하여 id를 얻는 함수
+	private String getMemberId(WebSocketSession session) {
+		 Map<String, Object> httpSession = session.getAttributes();
+		 UserVO userVO = (UserVO) httpSession.get("ses");
+		 return (userVO != null) ? userVO.getId() : null;
+	}
+}

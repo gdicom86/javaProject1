@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myweb.www.repository.BoardDAO">
+	<insert id="register" parameterType="com.myweb.www.domain.BoardVO">
+		insert into board(title, writer, content, searchType_a, searchType_b, searchType_add1, searchType_add2)
+		values(#{title}, #{writer}, #{content}, #{searchType_a}, #{searchType_b}, #{searchType_add1}, #{searchType_add2})
+	</insert>
+	<select id="getAllList" resultType="com.myweb.www.domain.BoardVO">
+		select * from board ORDER BY reg_date DESC
+	</select>
+	<select id="getDetail" resultType="com.myweb.www.domain.BoardVO">
+		select * from board where bno=#{bno} ORDER BY reg_date DESC
+	</select>
+	<update id="modify" parameterType="com.myweb.www.domain.BoardVO">
+		update board set title=#{title}, content=#{content}, 
+		searchType_a=#{searchType_a}, searchType_b=#{searchType_b}, 
+		searchType_add1=#{searchType_add1}, searchType_add2=#{searchType_add2} 
+		where bno=#{bno}
+	</update>
+	<delete id="delete">
+		delete from board where bno=#{bno}
+	</delete>
+	<update id="count">
+		update board set read_count=read_count+1 where bno=#{bno}
+	</update>
+	<select id="selectBno" resultType="int">
+		select max(bno) from board
+	</select>
+	<select id="getBvoList" resultType="com.myweb.www.domain.BoardVO" parameterType="String">
+		select * from board where writer=#{id} ORDER BY reg_date DESC
+	</select>
+	<update id="updateBoard" parameterType="com.myweb.www.domain.BoardVO">
+		update board set title=#{title}, content=#{content}, 
+		searchType_a=#{searchType_a}, searchType_b=#{searchType_b}, 
+		searchType_add1=#{searchType_add1}, searchType_add2=#{searchType_add2} 
+		where bno=#{bno}
+	</update>
+	<select id="getBvoListByType" resultType="com.myweb.www.domain.BoardVO">
+		 SELECT * FROM board
+	    <where>
+	        searchType_a = #{searchType_a}
+	        <if test="searchType_b != null and searchType_b != ''">
+	            AND searchType_b = #{searchType_b}
+	        </if>
+	    </where>
+	    ORDER BY reg_date DESC
+	    LIMIT #{pageSize} OFFSET ${(page - 1) * pageSize}
+	</select>
+	<select id="getBvoListByKeyword" resultType="com.myweb.www.domain.BoardVO">
+		SELECT * FROM board
+	    WHERE 
+	    <choose>
+	        <when test="searchKeyword != null and searchKeyword != ''">
+	            <foreach collection="searchKeyword.split(' ')" item="keyword" separator=" AND ">
+	                (
+	                    title LIKE CONCAT('%', #{keyword}, '%') OR
+	                    writer LIKE CONCAT('%', #{keyword}, '%') OR
+	                    content LIKE CONCAT('%', #{keyword}, '%') OR
+	                    searchType_a LIKE CONCAT('%', #{keyword}, '%') OR
+	                    searchType_b LIKE CONCAT('%', #{keyword}, '%') OR
+	                    searchType_add1 LIKE CONCAT('%', #{keyword}, '%') OR
+	                    searchType_add2 LIKE CONCAT('%', #{keyword}, '%')
+	                )
+	            </foreach>
+	        </when>
+	        <otherwise>
+	            1=1
+	        </otherwise>
+    	</choose>
+    	ORDER BY reg_date DESC
+    	LIMIT #{pageSize} OFFSET ${(page - 1) * pageSize}
+	</select>
+</mapper>

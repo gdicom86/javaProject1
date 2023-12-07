@@ -1,0 +1,181 @@
+body {
+  margin: 0;
+  border: 0;
+  padding: 0;
+}
+
+#logoDiv {
+  width: 20%;
+}
+
+#searchType {
+  width: 60%;
+  display: flex;
+  align-items: center;
+}
+
+#menu {
+  width: 20%;
+   white-space: nowrap; /* Prevents line breaks */
+}
+
+#navigation {
+  position: fixed;
+  top: 0;
+  z-index: 101;
+  background-color: rgb(246, 245, 239);
+  width: 100%;
+  height: 7.6rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid rgb(234, 234, 234);
+}
+
+#navigation img {
+  margin: 2rem;
+  height: 4rem;
+  width: 4rem;
+}
+
+a {
+  font-size: 1rem;
+  text-decoration: none;
+  color: rgb(85, 85, 85);
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+#menuList {
+  display: flex;
+  justify-content: flex-end;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  margin-right: 2rem;
+}
+
+#menuList li {
+  margin-left: 24px;
+  position: relative;
+}
+
+#menuList li:first-child a::after,
+#menuList li:nth-of-type(2) a::after {
+  border-right: 1px solid #ddd;
+  color: #666;
+  content: "";
+  height: 14px;
+  margin-top: -4px;
+  position: absolute;
+  top: 50%;
+  right: -12px;
+}
+
+#info {
+  position: relative;
+  margin: 8px 1rem;
+  display: flex;
+}
+
+#nav-close-button {
+  position: absolute;
+  top: -8px;
+  right: 8px;
+  font-size: 24px;
+  font-weight: 500;
+  cursor: pointer;
+  color: white;
+}
+
+#editAccountBtn {
+  cursor: pointer;
+}
+
+#editAccountBtn:hover {
+  text-decoration: underline;
+}
+
+#editAccountModal {
+  display: none;
+  position: absolute;
+  top: 1.8rem;
+  left: 0rem;
+  padding: 18px 10px 10px 10px;
+  border-radius: 4px;
+  z-index: 9999;
+  background-color: rgb(44, 42, 41);
+}
+
+#editAccountModal:after {
+  content: '';
+  position: absolute;
+  top: 0.1rem;
+  left: 1.7rem;
+  transform: translate(-50%, -100%);
+  width: 0;
+  height: 0;
+  border: 10px solid transparent;
+  border-bottom-color: rgb(44, 42, 41);
+}
+
+#editAccountModal a {
+  color: white;
+}
+
+#searchType {
+  display: flex;
+  margin-top: 2rem;
+}
+
+.searchTypeDiv {
+  margin: 0 1rem;
+  position: relative;
+  width: 7rem;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.searchTypeHover {
+  display: none;
+}
+
+.searchTypeDiv:hover .searchTypeHover {
+  display: block;
+}
+
+.searchTypeHover {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  padding: 10px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+/* 통합검색 Style */
+#search {
+  cursor: pointer;
+  text-align: center;
+  align-items: center;
+  white-space: nowrap;
+}
+
+#search i {
+  font-size: 0.9rem;
+}
+
+#searchInput {
+  display: none;
+}
+/* MSG */
+#msgStack {
+	position: relative;
+}
+#toastDiv {
+	position: absolute;
+	top: 10ppx;
+}

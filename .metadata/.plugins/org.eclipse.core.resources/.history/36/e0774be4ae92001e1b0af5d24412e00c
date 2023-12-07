@@ -1,0 +1,335 @@
+package com.myweb.www.controller;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import org.springframework.http.MediaType;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.myweb.www.domain.BoardDTO;
+import com.myweb.www.domain.BoardVO;
+import com.myweb.www.domain.FileVO;
+import com.myweb.www.domain.UserVO;
+import com.myweb.www.handler.FileHandler;
+import com.myweb.www.repository.UserDAO;
+import com.myweb.www.service.BoardService;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@RequestMapping("/board/*")
+@Controller
+public class BoardController {
+	
+	@Autowired
+	private BoardService bsv;
+	
+	@Autowired
+	private UserDAO udao;
+	
+	@Autowired
+	private FileHandler fhd;
+	
+	@GetMapping("/register")
+	public String registerGet(HttpServletRequest request, Model model) {
+		HttpSession session = request.getSession();
+	
+		if (session.getAttribute("ses") != null) {
+			UserVO uvo = (UserVO) session.getAttribute("ses");
+			System.out.println("uvo: " + uvo.toString());
+			
+			String customerType = uvo.getCustomerType();
+			System.out.println("customerType: " + customerType);
+			
+			if ("third".equals(customerType)) {
+				model.addAttribute("notRegister", 1);
+				return "home";
+			}			
+			return "/board/register";		
+		} else {
+			model.addAttribute("notRegister", 1);
+			return "home";
+		}
+	}
+	
+	// required(필수여부)=false: 해당 파라미터가 없더라도 예외가 발생하지 않음
+	@PostMapping("/register")
+	public String registerPost(BoardVO bvo, Model model,
+			@RequestParam(name="thumbFiles", required=false) MultipartFile[] thumbFiles,
+			@RequestParam(name="detailFiles", required=false) MultipartFile[] detailFiles) {
+		
+		log.info("bvo: " + bvo.toString());
+		log.info("thumbFiles: " + thumbFiles.toString());
+		log.info("detailFiles: " + detailFiles.toString());
+		
+		List<FileVO> thumbFileList = null;
+        List<FileVO> detailFileList = null;
+        List<FileVO> combinedList = new ArrayList<>();
+        // 파일 핸들러를 사용하여 썸네일 파일 처리
+        if (thumbFiles != null && thumbFiles.length > 0) {
+            thumbFileList = fhd.uploadThumbnailFiles(thumbFiles);
+        }
+
+        // 파일 핸들러를 사용하여 상세사진 파일 처리
+        if (detailFiles != null && detailFiles.length > 0) {
+            detailFileList = fhd.uploadDetailFiles(detailFiles);
+        }
+        
+        // 두 리스트를 합침
+        combinedList.addAll(thumbFileList);
+        combinedList.addAll(detailFileList);
+        
+        BoardDTO bdto = new BoardDTO(bvo, combinedList);
+        int isOk = bsv.register(bdto);
+        
+		// int isOk = bsv.register(bvo);
+		String result = isOk > 0 ? "등록 성공" : "등록 실패";
+		log.info(result);
+		return "redirect:/board/myBoardManagement";
+	}
+	
+	@GetMapping("/myBoardManagement")
+	public String myBoardManagementGet(Model model, HttpSession session) {
+		UserVO uvo = (UserVO) session.getAttribute("ses");
+
+		if(uvo != null) {
+			List<BoardDTO> myBdtoList = bsv.getMyBdtoList(uvo.getId());
+			model.addAttribute("myBdtoList", myBdtoList);
+			return "/board/myBoardManagement";
+		} else {
+			return "redirect:/user/signIn";
+		}		
+	}
+	
+	@GetMapping("/detail")
+	public String detail(Model model, @RequestParam("bno") int bno) {
+		log.info("bno: " + bno);
+		// BoardVO bvo = bsv.getDetail(bno);
+		BoardDTO bdto = bsv.getDetailDto(bno);
+		int isOk = bsv.count(bno);
+		log.info("count up" + (isOk > 0 ? "success" : "failed"));
+		model.addAttribute("bdto", bdto);
+		return "/board/detail";
+	}
+	
+	@GetMapping("/modify")
+	public String modifyGet(Model model, @RequestParam("bno") int bno) {
+		// log.info("bno: " + bno);
+		// BoardVO bvo = bsv.getDetail(bno);
+		BoardDTO bdto = bsv.getDetailDto(bno);
+		model.addAttribute("bdto", bdto);
+		return "/board/modify";
+	}
+	
+	@PostMapping("/modify")
+	public String modifyPost(BoardVO bvo,
+	                          @RequestParam(name="thumbFiles", required=false) MultipartFile[] thumbFiles,
+	                          @RequestParam(name="detailFiles", required=false) MultipartFile[] detailFiles) {
+	    log.info("bvo: " + bvo.toString());
+	    log.info("thumbFiles: " + Arrays.toString(thumbFiles));
+	    log.info("detailFiles: " + Arrays.toString(detailFiles));
+
+	    // 로그인한 유저 가져오기
+	    UserVO uvo = udao.getUser(bvo.getWriter());
+
+	    List<FileVO> thumbFileList = new ArrayList<>();
+	    List<FileVO> detailFileList = new ArrayList<>();
+
+	    // 썸네일 파일 처리
+	    if (thumbFiles != null) {
+	        for (MultipartFile thumbFile : thumbFiles) {
+	            if (!thumbFile.isEmpty()) {
+	                thumbFileList.addAll(fhd.uploadThumbnailFiles(new MultipartFile[]{thumbFile}));
+	            }
+	        }
+	    }
+
+	    // 상세사진 파일 처리
+	    if (detailFiles != null) {
+	        for (MultipartFile detailFile : detailFiles) {
+	            if (!detailFile.isEmpty()) {
+	                detailFileList.addAll(fhd.uploadDetailFiles(new MultipartFile[]{detailFile}));
+	            }
+	        }
+	    }
+
+	    // 두 리스트를 합침
+	    List<FileVO> combinedList = new ArrayList<>();
+	    combinedList.addAll(thumbFileList);
+	    combinedList.addAll(detailFileList);
+
+	    if (!combinedList.isEmpty()) {
+	        BoardDTO bdto = new BoardDTO(bvo, combinedList);
+	        // DB update
+	        int isOk = bsv.modifyDTO(uvo, bdto);
+	        String result = isOk > 0 ? "사진까지 수정 성공" : "사진까지 수정 실패";
+	        log.info(result);
+	    } else {
+	        int isOk = bsv.modify(bvo);
+	        String result = isOk > 0 ? "보드만 수정 성공" : "보드만 수정 실패";
+	        log.info(result);
+	    }
+
+	    return "redirect:/board/myBoardManagement";
+	}
+	
+	@PostMapping("/delete")
+	public ResponseEntity<String> delete(@RequestParam("bno") int bno) {
+	    log.info("bno: " + bno);
+	    int isOk = bsv.delete(bno);
+	    String result = isOk > 0 ? "Y" : "N";
+	    log.info("result: " + result);
+
+	    return ResponseEntity.ok(result);
+	}
+	
+	@DeleteMapping(value="/file/{uuid}", produces = {MediaType.TEXT_PLAIN_VALUE})
+	public ResponseEntity<String> removeFile(@PathVariable("uuid")String uuid) {
+		log.info("uuid: " + uuid);
+		return bsv.removeFile(uuid) > 0 ?
+				new ResponseEntity<String>("1", HttpStatus.OK) : 
+					new ResponseEntity<String>("0", HttpStatus.INTERNAL_SERVER_ERROR);
+		
+	}
+	
+	// Search Control
+	@GetMapping("/searchType")
+	public String searchType(
+			@RequestParam(value = "searchType_a", required = true) String searchType_a,
+            @RequestParam(value = "searchType_b", required = false) String searchType_b, Model model) {
+		log.info("searchType_a: " + searchType_a);
+		log.info("searchType_b: " + searchType_b);
+		// 서비스 호출 시 페이지 크기 전달
+		int pageSize = 8;
+		
+		List<BoardDTO> bdtoList = bsv.getDetail(searchType_a, searchType_b, pageSize);
+		log.info("bdtoList: " + bdtoList);
+		model.addAttribute("bdtoList", bdtoList);
+		
+		return "/board/searchByType";
+	}
+	
+	// searchType 더보기 기능
+	@GetMapping("/searchTypeMore")
+	public List<BoardDTO> searchTypeMore(Model model,
+			@RequestParam(value = "page", defaultValue = "1") int page,
+			@RequestParam(value = "searchType_a", required = true) String searchType_a,
+            @RequestParam(value = "searchType_b", required = false) String searchType_b) {
+		log.info("searchType_a: " + searchType_a);
+		log.info("searchType_b: " + searchType_b);
+		
+		// 서비스 호출 시 페이지 크기 전달
+		int pageSize = 8;
+		
+		return bsv.getDetailMore(searchType_a, searchType_b, pageSize, page);		
+	}
+	
+	// searchKeyword
+	@GetMapping("/search")
+	public String search(
+			@RequestParam(name = "search", required = false, defaultValue = "") String searchKeyword, 
+			Model model) {
+		log.info("search Keyword: " + searchKeyword);
+		// 서비스 호출 시 페이지 크기 전달
+		int pageSize = 8;
+		
+		List<BoardDTO> searchDtoList = bsv.searchDTOList(searchKeyword, pageSize);
+		log.info("searchDtoList: " + searchDtoList);
+		model.addAttribute("searchKeyword", searchKeyword);
+		model.addAttribute("bdtoList", searchDtoList);
+		return "/board/searchByKeyword";
+	}
+	
+	// searchKeyword More
+	@GetMapping("/searchMore")
+	public List<BoardDTO> searchMore(Model model,
+			@RequestParam(value = "page", defaultValue = "1") int page,
+			@RequestParam(name = "search", required = false, defaultValue = "") String searchKeyword) {
+		log.info("search Keyword: " + searchKeyword);
+		// 서비스 호출 시 페이지 크기 전달
+		int pageSize = 8;
+		
+		return bsv.searchDTOListMore(searchKeyword, pageSize, page);
+	}
+	
+	@PostMapping("/searchByArea")
+	public String searchByArea( 
+	    @RequestParam(value = "search", required = false) String searchKeyword,
+	    @RequestParam(value = "searchType_a", required = false) String searchType_a,
+	    @RequestParam(value = "searchType_b", required = false) String searchType_b,
+	    @RequestParam(value = "searchType_add1", required = true) String searchType_add1,
+	    @RequestParam(value = "searchType_add2", required = false) String searchType_add2,
+	    Model model) {
+
+	    log.info("search Keyword: " + searchKeyword);
+	    log.info("searchType_a: " + searchType_a);
+	    log.info("searchType_b: " + searchType_b);
+	    log.info("searchType_add1: " + searchType_add1);
+	    log.info("searchType_add2: " + searchType_add2);
+	    
+	    // 서비스 호출 시 페이지 크기 전달
+ 		int pageSize = 8;
+
+	    List<BoardDTO> bdtoList = new ArrayList<>();
+
+	    if (searchKeyword != null && !searchKeyword.isEmpty()) {
+	        bdtoList = bsv.searchDTOList(searchKeyword, pageSize).stream()
+	                .filter(boardDTO -> boardDTO.getBvo().getSearchType_add1().equals(searchType_add1) && boardDTO.getBvo().getSearchType_add2().equals(searchType_add2))
+	                .collect(Collectors.toList());
+	    } else if (searchType_a != null && !searchType_a.isEmpty()) {
+	        bdtoList = bsv.getDetail(searchType_a, searchType_b, pageSize).stream()
+	                .filter(boardDTO -> boardDTO.getBvo().getSearchType_add1().equals(searchType_add1) && boardDTO.getBvo().getSearchType_add2().equals(searchType_add2))
+	                .collect(Collectors.toList());
+	    }
+
+	    model.addAttribute("bdtoList", bdtoList);
+	    return "/board/searchByArea";
+	}
+	
+	@GetMapping("/searchByAreaMore")
+	public List<BoardDTO> searchByAreaMore(@RequestParam(value = "page", defaultValue = "1") int page, 
+	    @RequestParam(value = "search", required = false) String searchKeyword,
+	    @RequestParam(value = "searchType_a", required = false) String searchType_a,
+	    @RequestParam(value = "searchType_b", required = false) String searchType_b,
+	    @RequestParam(value = "searchType_add1", required = true) String searchType_add1,
+	    @RequestParam(value = "searchType_add2", required = false) String searchType_add2, Model model) {
+
+	    log.info("search Keyword: " + searchKeyword);
+	    log.info("searchType_a: " + searchType_a);
+	    log.info("searchType_b: " + searchType_b);
+	    log.info("searchType_add1: " + searchType_add1);
+	    log.info("searchType_add2: " + searchType_add2);
+	    
+	    // 서비스 호출 시 페이지 크기 전달
+ 		int pageSize = 8;
+
+	    List<BoardDTO> bdtoList = new ArrayList<>();
+
+	    if (searchKeyword != null && !searchKeyword.isEmpty()) {
+	        return bsv.searchDTOListMore(searchKeyword, pageSize, page).stream()
+	                .filter(boardDTO -> boardDTO.getBvo().getSearchType_add1().equals(searchType_add1) && boardDTO.getBvo().getSearchType_add2().equals(searchType_add2))
+	                .collect(Collectors.toList());
+	    } else if (searchType_a != null && !searchType_a.isEmpty()) {
+	        return bsv.getDetailMore(searchType_a, searchType_b, pageSize, page).stream()
+	                .filter(boardDTO -> boardDTO.getBvo().getSearchType_add1().equals(searchType_add1) && boardDTO.getBvo().getSearchType_add2().equals(searchType_add2))
+	                .collect(Collectors.toList());
+	    }
+	}
+	
+}

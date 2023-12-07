@@ -1,0 +1,11 @@
+#oldThumbFileZone,
+#oldDetailFileZone {
+	margin: 20px 0;
+}
+
+#oldThumbFileZone img,
+#oldDetailFileZone img {
+	width: 200px;
+	height: 200px;
+	margin-bottom: 10px;
+}

@@ -1,0 +1,60 @@
+// 모달 창 열고 닫기
+document.addEventListener("DOMContentLoaded", function () {
+  var confirmationModal = document.getElementById("confirmationModal");
+  var lvoTrButton = document.getElementById("lvoTr");
+  var closeButton = document.getElementById("close-button");
+  var cancelAction = document.getElementById("cancelAction");
+
+  lvoTrButton.addEventListener("click", function () {
+    confirmationModal.style.display = "block";
+  });
+
+  closeButton.addEventListener("click", function () {
+    confirmationModal.style.display = "none";
+  });
+
+  cancelAction.addEventListener("click", function () {
+    confirmationModal.style.display = "none";
+  });
+
+  window.addEventListener("click", function (event) {
+    if (event.target === confirmationModal) {
+      confirmationModal.style.display = "none";
+    }
+  });
+});
+
+document.getElementById("confirmAction").addEventListener("click", function () {
+  const lno = "${lvo.lno}";
+  const id = "${lvo.id}";
+
+  console.log("lno: " + lno);
+  console.log("id: " + id);
+
+  // AJAX 요청 보내기
+  $.ajax({
+    type: "POST",
+    url: "/levelUp/proceeding",
+    data: {
+      "lno": lno,
+      "id": id,
+    },
+    success: function (data) {
+      Swal.fire(
+      	"신청 확인!", 
+      	"등업이 완료되었습니다.", 
+      	"success"
+      	).then(() => {
+        	window.location.href = "/levelUp/needConfirm";
+      });
+    },
+    error: function (xhr, status, error) {
+      Swal.fire(
+        "오류 발생!",
+        "상담을 확인하는 동안 문제가 발생했습니다. 다시 시도해주세요.",
+        "error"
+      );
+      console.error(error);
+    },
+  });
+});

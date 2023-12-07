@@ -1,0 +1,43 @@
+package com.myweb.www.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.myweb.www.domain.LevelUpVO;
+import com.myweb.www.repository.LevelUpDAO;
+import com.myweb.www.repository.UserDAO;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Service
+public class LevelUpServiceImpl implements LevelUpService {
+	
+	@Autowired
+	private LevelUpDAO ldao;
+	
+	@Autowired
+	private UserDAO udao;
+
+	@Override
+	public int register(LevelUpVO lvo) {
+		 log.info(" LevelUpVO register LevelUpServiceImpl in");
+		 int isOk = ldao.register(lvo);
+		 return isOk;
+	}
+
+	@Override
+	public List<LevelUpVO> getList() {
+		log.info(" List<LevelUpVO> getList LevelUpServiceImpl in");
+		List<LevelUpVO> lvoList = ldao.getList();
+		return lvoList;
+	}
+
+	@Override
+	public int updateConfirm(int lno, String id) {
+		log.info(" updateConfirm LevelUpServiceImpl in");
+		return 0;
+	}
+}

@@ -1,0 +1,83 @@
+// 개인정보 수집 정보 모달 창
+var policyModal = document.getElementById("policy-modal");
+var policyButton = document.getElementById("privacy-policy");
+var closeButton = document.getElementById("close-button-policy");
+
+var policyModal1 = document.getElementById("policy-modal1");
+var policyButton1 = document.getElementById("privacy-policy1");
+var closeButton1 = document.getElementById("close-button-policy1");
+
+// 여기서 각각의 변수가 null이 아닌지 확인합니다.
+if (policyButton) {
+    policyButton.addEventListener('click', function() {
+        policyModal.style.display = "block";
+    });
+}
+
+if (closeButton) {
+    closeButton.addEventListener('click', function() {
+        policyModal.style.display = "none";
+    });
+}
+
+if (policyButton1) {
+    policyButton1.addEventListener('click', function() {
+        policyModal1.style.display = "block";
+    });
+}
+
+if (closeButton1) {
+    closeButton1.addEventListener('click', function() {
+        policyModal1.style.display = "none";
+    });
+}
+
+// 나머지 코드는 그대로 유지됩니다.
+
+
+// 폼 전송 방지
+function validateButton(event) {
+    var phone = document.querySelector('input[name="phone"]');
+    var phoneError = document.getElementById("phoneError");
+    
+    var businessNumber = document.querySelector('input[name="businessNumber"]');
+    var businessNumberError = document.getElementById("businessNumberError");
+
+    var contentTextarea = document.querySelector('textarea[name="content"]');
+    var contentError = document.getElementById("contentError");
+
+	var checkbox = document.querySelector('input[type="checkbox"]');
+	
+    var isFormValid = true;
+
+    if (phone.value.trim() !== "") {
+        phoneError.style.display = "none";
+    } else {
+        isFormValid = false;
+        phoneError.style.display = "block";
+    }
+
+    if (businessNumber.value.trim() !== "") {
+        businessNumberError.style.display = "none";
+    } else {
+        isFormValid = false;
+        businessNumberError.style.display = "block";
+    }
+
+    if (contentTextarea.value.trim() !== "") {
+        contentError.style.display = "none";
+    } else {
+        isFormValid = false;
+        contentError.style.display = "block";
+    }
+         
+    if (!checkbox.checked) {
+    	isFormValid = false;
+        alert("개인정보 수집에 동의해야 합니다.");
+	}
+	
+    console.log(isFormValid);
+    if (!isFormValid) {
+        event.preventDefault();
+    }
+}

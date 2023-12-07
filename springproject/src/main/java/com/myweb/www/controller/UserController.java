@@ -1,0 +1,413 @@
+package com.myweb.www.controller;
+
+import java.util.Random;
+
+import javax.mail.internet.MimeMessage;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import com.github.scribejava.core.model.OAuth2AccessToken;
+import com.myweb.www.api.KakaoLoginBO;
+import com.myweb.www.api.NaverLoginBO;
+import com.myweb.www.domain.UserVO;
+import com.myweb.www.service.UserService;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@RequestMapping("/user/*")
+@Controller
+public class UserController {
+	
+	@Autowired
+	private JavaMailSender mailSender;
+	
+	@Autowired
+	private UserService usv;
+	
+	@GetMapping("/signUp")
+	public String signUpGet(Model m) {
+		String pageTitle = "Sign Up";
+		m.addAttribute("pageTitle", pageTitle);
+		return "/user/signUp";
+	}
+	
+	@PostMapping("/signUp")
+	public String signUpPost(Model m, UserVO uvo) {
+		log.info("Sign Up Post 접근");
+		log.info(uvo.toString());
+		int isOk = usv.signUp(uvo);
+		if(isOk > 0) {
+			m.addAttribute("msg_signUp", 1);
+		} else {
+			m.addAttribute("msg_signUp", 0);
+		}
+		String pageTitle = "Welcome to my world";
+		m.addAttribute("pageTitle", pageTitle);
+		return "home";
+	}
+	
+	@PostMapping("/idCheck")
+	@ResponseBody
+	public String idCheck(@RequestParam("id") String id) {
+		String result = "N";
+		int cnt = usv.idCheck(id);	
+		if(cnt == 1) result ="Y";
+		return result;
+	}
+	
+	@GetMapping("/mailSender")
+	@ResponseBody
+	public String mailSending(String email) {
+		// 뷰에서 넘어왔는지 확인
+		System.out.println("이메일 전송");
+		
+		// 난수 생성(인증번호)
+		Random r = new Random();
+		int num = r.nextInt(888888) + 111111;  //111111 ~ 999999
+		System.out.println("인증번호:" + num);
+		
+		// 이메일 보내기
+		String setFrom = "gdicom86@gmail.com"; //보내는 이메일
+        String toMail = email; //받는 사람 이메일
+        String title = "회원가입 인증 이메일 입니다.";
+        String content = 
+                "부동산 코리아 홈페이지를 방문해주셔서 감사합니다." +
+                "<br><br>" + 
+                "인증 번호는 " + num + "입니다." + 
+                "<br>" + 
+                "해당 인증번호를 인증번호 확인란에 기입하여 주세요.";
+        
+        try {            
+	        MimeMessage message = mailSender.createMimeMessage();
+	        MimeMessageHelper helper = new MimeMessageHelper(message, true, "utf-8");
+	        helper.setFrom(setFrom);
+	        helper.setTo(toMail);
+	        helper.setSubject(title);
+	        helper.setText(content,true);
+	        mailSender.send(message);            
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        
+        String rnum = Integer.toString(num);  //view로 다시 반환할 때 String만 가능
+        
+        return rnum;
+	}
+	
+	// 네이버 로그인 페이지
+	// 로그인 첫 화면 요청 메소드
+	// 기존 로그인에 혼용
+	
+	/* NaverLoginBO */
+	private NaverLoginBO naverLoginBO;
+	private String apiResult = null;
+		
+	@Autowired
+	private void setNaverLoginBO(NaverLoginBO naverLoginBO) {
+		this.naverLoginBO = naverLoginBO;
+	}
+	
+	/* KakaoLoginBO */
+	private KakaoLoginBO kakaoLoginBO;
+	
+	@Autowired
+	private void setKakaoLoginBO(KakaoLoginBO kakaoLoginBO) {
+		this.kakaoLoginBO = kakaoLoginBO;
+	}
+	
+	@GetMapping("/signIn")
+	public String signInGet(Model model, HttpSession session) {
+		
+		/* 네이버아이디로 인증 URL을 생성하기 위하여 naverLoginBO클래스의 getAuthorizationUrl메소드 호출 */
+		String naverAuthUrl = naverLoginBO.getAuthorizationUrl(session);
+		//https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=sE***************&
+		//redirect_uri=http%3A%2F%2F211.63.89.90%3A8090%2Flogin_project%2Fcallback&state=e68c269c-5ba9-4c31-85da-54c16c658125
+		System.out.println("네이버:" + naverAuthUrl);	
+		//네이버 url
+		model.addAttribute("urlNaver", naverAuthUrl);
+		
+		/* 카카오 */
+		String kakaoAuthUrl = kakaoLoginBO.getAuthorizationUrl(session);
+		System.out.println("카카오:" + kakaoAuthUrl);	
+		model.addAttribute("urlKakao", kakaoAuthUrl);
+		
+		String pageTitle = "Sign In";
+		model.addAttribute("pageTitle", pageTitle);
+		
+		/* 생성한 인증 URL을 View로 전달 */
+		return "/user/signIn";
+	}
+	
+	// 네이버 로그인 성공시 callback 호출 메소드
+	// 네이버 버튼에 src를 signIn에서 model로 전송 받았다. 
+	@RequestMapping(value = "/callback", method = { RequestMethod.GET, RequestMethod.POST })
+	public String callback(Model model, @RequestParam String code, @RequestParam String state, HttpSession session)
+			throws Exception {
+		System.out.println("naver login success callback");
+		OAuth2AccessToken oauthToken;
+        oauthToken = naverLoginBO.getAccessToken(session, code, state);
+        //로그인 사용자 정보를 읽어온다.
+	    apiResult = naverLoginBO.getUserProfile(oauthToken);
+	    
+	    JSONParser jsonParser = new JSONParser();
+	    JSONObject jsonObj;
+	    
+	    jsonObj = (JSONObject) jsonParser.parse(apiResult);
+	    JSONObject response_obj = (JSONObject) jsonObj.get("response");
+	    
+	    // 프로필 조회
+	    String email = (String) response_obj.get("email");
+	    // String name = (String) response_obj.get("name");
+	    // 이메일에서 @ 앞의 부분 추출
+	    String[] parts = email.split("@");
+	    String id = parts[0];
+
+	    // id 변수를 사용하여 원하는 작업 수행
+	    System.out.println("ID: " + id);
+	    // session && model 사용자 정보 등록
+	    session.setAttribute("apiSes", apiResult);
+	    session.setAttribute("name", id);
+	    session.setAttribute("email", email);
+
+        /* 네이버 로그인 성공 페이지 View 호출 해당경로에 별도 생성 필요*/
+	    // 모달창으로 성공여부 확인
+	    String pageTitle = "Welcome to my world";
+		model.addAttribute("pageTitle", pageTitle);
+		model.addAttribute("loginSuccess", 1);
+		return "home";
+	}
+	
+	@RequestMapping(value = "/callbackKakao", method = { RequestMethod.GET, RequestMethod.POST })
+	public String callbackKakao(Model model, @RequestParam String code, @RequestParam String state, HttpSession session)
+			throws Exception {
+		System.out.println("kakao login success callbackKakao");
+		OAuth2AccessToken oauthToken;
+        oauthToken = kakaoLoginBO.getAccessToken(session, code, state);
+        //로그인 사용자 정보를 읽어온다.
+	    apiResult = kakaoLoginBO.getUserProfile(oauthToken);
+	    System.out.println("apiResult: " + apiResult);
+	    JSONParser jsonParser = new JSONParser();
+	    JSONObject jsonObj;
+	    
+	    jsonObj = (JSONObject) jsonParser.parse(apiResult);
+	    JSONObject response_obj = (JSONObject) jsonObj.get("kakao_account");
+	    // JSONObject response_obj2 = (JSONObject) response_obj.get("profile");
+	    
+	    // 프로필 조회
+	    String email = (String) response_obj.get("email");
+	    // String name = (String) response_obj2.get("nickname");
+	    // 이메일에서 @ 앞의 부분 추출
+	    String[] parts = email.split("@");
+	    String id = parts[0];
+
+	    // id 변수를 사용하여 원하는 작업 수행
+	    System.out.println("ID: " + id);
+	    // session && model 사용자 정보 등록
+	    session.setAttribute("apiSes", apiResult);
+	    session.setAttribute("name", id);
+	    session.setAttribute("email", email);
+
+        /* 네이버 로그인 성공 페이지 View 호출 해당경로에 별도 생성 필요*/
+	    // 모달창으로 성공여부 확인
+	    String pageTitle = "Welcome to my world";
+		model.addAttribute("pageTitle", pageTitle);
+		model.addAttribute("loginSuccess", 1);
+		return "home";
+	}
+	
+	@PostMapping("/signIn")
+	public String signInPost(Model m, @ModelAttribute UserVO uvo, HttpServletRequest req) {
+		// session을 이용하려면 HttpServletRequest이 필요하다.
+		// method post -> mapping될 때 jsp에서 가져온 param 사용 가능
+		String id = uvo.getId();
+	    String pw = uvo.getPw();
+		// HttpServletRequest를 이용해 가져온 param(id, pw)를
+		// Database에 넘겨 일치하는 객체를 받는다. 
+		UserVO existUser = usv.existUser(id, pw);
+		
+		// DB -> serviceImpl에서 얻은 객체가 null이 아니라면 session set
+		if(existUser != null) {
+			HttpSession ses = req.getSession();
+			ses.setAttribute("ses", existUser); // session에 uvo객체 담기
+			ses.setAttribute("id", existUser.getId());
+			ses.setMaxInactiveInterval(60*10); // 로그인 유지시간
+		} else {
+			m.addAttribute("msg_signIn", 0);
+			String pageTitle = "Sign In";
+			m.addAttribute("pageTitle", pageTitle);
+			return "/user/signIn";
+		}
+		String pageTitle = "Welcome to my world";
+		m.addAttribute("pageTitle", pageTitle);
+		return "home";
+	}
+	
+	@GetMapping("/signOut")
+	public String signOut(Model m, HttpServletRequest req) {
+		req.getSession().removeAttribute("ses"); // ses.setAttribute("ses", existUser); 삭제
+		req.getSession().invalidate(); // 세션 끊기
+		String pageTitle = "Welcome to my world";
+		m.addAttribute("pageTitle", pageTitle);
+		return "home";
+	}
+	
+	@GetMapping("/searchId")
+	public String searchIdGet(Model m) {
+		String pageTitle = "아이디 찾기";
+		m.addAttribute("pageTitle", pageTitle);
+		return "/user/searchId";
+	}
+	
+	@PostMapping("/searchId")
+	@ResponseBody
+	public String searchIdPost(Model m, String name, String phone) {
+		System.out.println("name: " + name);
+		System.out.println("phone: " + phone);
+		
+		String searchedId = usv.searchId(name, phone);
+		
+		System.out.println("searchedId: " + searchedId);
+		
+		String pageTitle = "아이디 찾기";
+		m.addAttribute("pageTitle", pageTitle);
+		
+		return searchedId;
+	}
+	
+	@GetMapping("/searchPw")
+	public String searchPwGet(Model m) {
+		String pageTitle = "비밀번호 찾기";
+		m.addAttribute("pageTitle", pageTitle);
+		return "/user/searchPw";
+	}
+	
+	@PostMapping("/searchPw")
+	@ResponseBody
+	public String searchPwPost(Model m, String id, String email) {
+		System.out.println("id: " + id);
+		System.out.println("email: " + email);
+		
+		String result = "Y";
+		String key = "";
+		int isOk = usv.searchPw(id, email);
+		System.out.println("isOk: " + isOk);
+		
+		// 여기서 isOk가 1이면 이메일 전송 -> js에 리턴 'Y'
+		// isOk가 0이면 이메일 전송 X -> js에 리턴 'N'
+		if (isOk == 0) {
+			result = "N";
+		} else {
+			// 비밀번호 생성 -> 비밀번호 이메일 전송 -> 비밀번호 저장
+			// 비밀번호 생성
+			Random r = new Random();
+			int num = r.nextInt(888888) + 111111;  //111111 ~ 999999
+			key = Integer.toString(num);
+			System.out.println("새 비밀번호: " + key);		
+			
+			// 이메일 보내기
+			String setFrom = "gdicom86@gmail.com"; //보내는 이메일
+	        String toMail = email; //받는 사람 이메일
+	        String title = "임시 비밀번호가 발급되었습니다.";
+	        String content = 
+	        		id + "님 부동산 코리아 홈페이지를 방문해주셔서 감사합니다." +
+	                "<br><br>" + 
+	                "임시로 발급 드린 비밀번호는 " + key + "입니다." + 
+	                "<br>" + 
+	                "로그인후 비밀번호 변경을 권고드립니다.";
+	        
+	        try {            
+		        MimeMessage message = mailSender.createMimeMessage();
+		        MimeMessageHelper helper = new MimeMessageHelper(message, true, "utf-8");
+		        helper.setFrom(setFrom);
+		        helper.setTo(toMail);
+		        helper.setSubject(title);
+		        helper.setText(content,true);
+		        mailSender.send(message);            
+	        } catch(Exception e) {
+	            e.printStackTrace();
+	        }
+	        
+	        // 비밀번호 저장 ( 암호화 )
+	        int change = usv.updatePw(id, email, key);
+	        String message = (change > 0) ? "비밀번호가 업데이트되었습니다." : "비밀번호 업데이트에 실패했습니다.";
+	        System.out.println(message);
+		}
+			
+		String pageTitle = "비밀번호 찾기";
+		m.addAttribute("pageTitle", pageTitle);
+			
+		
+		return result;
+	}
+
+	@GetMapping("/closeAccount")
+	public String closeAccountGet(Model m) {
+		String pageTitle = "회원탈퇴";
+		m.addAttribute("pageTitle", pageTitle);
+		return "/user/closeAccount";
+	}
+	
+	@PostMapping("/closeAccount")
+	@ResponseBody
+	public String closeAccountPost(HttpSession session) {
+	    UserVO uvo = (UserVO) session.getAttribute("ses");
+	    if (uvo != null) {
+	        String userId = uvo.getId();
+	        System.out.println("userId: " + userId);  
+	        
+	        int isOk = usv.closeAccount(userId);
+	        String message = (isOk > 0) ? "성공적으로 계정 해지되었습니다." : "계정 해지에 실패했습니다.";
+	        System.out.println(message);
+	        session.removeAttribute("ses"); 
+	        // 사용자가 로그인한 세션은 유지되고 사용자 데이터만 삭제
+	        // 사용자가 로그인한 상태를 유지하면서 회원 탈퇴한 경우, 이 방법이 적합
+
+	        session.invalidate(); 
+	        // 현재 사용자의 모든 세션 데이터가 삭제 + 로그아웃
+	        // 사용자의 로그아웃이 필요한 경우나 보안상 중요한 정보를 다루는 경우에 사용
+	        return userId;
+	    } else {
+	        return "N";
+	    }
+	}
+	
+	@GetMapping("/editAccount")
+	public String editAccountGet(Model m) {
+		String pageTitle = "정보수정";
+		m.addAttribute("pageTitle", pageTitle);
+		return "/user/editAccount";
+	}
+	
+	@PostMapping("/editAccount")
+	public String editAccountPost(Model m, UserVO uvo) {
+		log.info("editAccount post 접근");
+		log.info(uvo.toString());
+		int isOk = usv.editAccount(uvo);
+		if(isOk > 0) {
+			m.addAttribute("msg_editAccount", 1);
+		}
+		String message = (isOk > 0) ? "정보수정 성공" : "정보수정 실패";
+		System.out.println(message);
+		String pageTitle = "Welcome to my world";
+		m.addAttribute("pageTitle", pageTitle);
+		return "home";
+	}
+	
+
+	
+}

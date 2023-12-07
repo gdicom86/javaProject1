@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myweb.www.repository.LevelUpDAO">
+	<insert id="register" parameterType="com.myweb.www.domain.LevelUpVO">
+		INSERT INTO levelUp(id, phone, businessNumber, content)
+		VALUES(#{id}, #{phone}, #{businessNumber}, #{content})
+	</insert>
+	<select id="getList" resultType="com.myweb.www.domain.LevelUpVO">
+		SELECT * FROM (
+		SELECT lno from levelUp
+		WHERE confirm="n"
+		LIMIT #{pageStart}, #{qty}
+		) a left join levelUp b
+		on a.lno=b.lno
+	</select>
+	<!-- 등업 게시글 삭제 -->
+	<update id="updateConfirm">
+		UPDATE levelUp SET confirm = "y" WHERE lno=#{lno}
+	</update>
+	<!-- ph totalCount -->
+	<select id="getTotalCount" resultType="int">
+		SELECT COUNT(lno) from levelUp WHERE confirm="n"
+	</select>
+	<!-- selectAlarm -->
+	<select id="selectAlarm" resultType="com.myweb.www.domain.LevelUpVO">
+		SELECT * FROM levelUp WHERE id=#{hsid} AND confirm="y"
+	</select>
+	<!-- deleteAlarm -->
+	<delete id="deleteAlarm">
+		DELETE FROM levelUp WHERE id=#{id}
+	</delete>
+</mapper>

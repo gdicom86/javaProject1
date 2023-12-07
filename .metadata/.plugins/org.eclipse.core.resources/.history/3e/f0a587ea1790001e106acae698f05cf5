@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myweb.www.repository.LevelUpDAO">
+	<insert id="register" parameterType="com.myweb.www.domain.LevelUpVO">
+		insert into board(title, writer, content, searchType_a, searchType_b, searchType_add1, searchType_add2)
+		values(#{title}, #{writer}, #{content}, #{searchType_a}, #{searchType_b}, #{searchType_add1}, #{searchType_add2})
+	</insert>
+</mapper>

@@ -1,0 +1,25 @@
+.content {
+  max-width: 80%;
+  margin: 14rem auto 1rem;
+}
+
+h1 {
+  text-align: center;
+}
+
+/* 셀 주변에 여백 추가 */
+th, td {
+  text-align: center;
+  padding: 15px; 
+}
+
+/* 테이블 행 하이라이트 */
+tbody tr:hover {
+  background-color: #007bff;
+  color: red;
+}
+/* 테이블에 border-radius 추가 */
+.table {
+  border-radius: 15px;
+  overflow: hidden; /* 테이블에 border-radius가 적용되게 함 */
+}

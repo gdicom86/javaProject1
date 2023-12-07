@@ -1,0 +1,186 @@
+package com.myweb.www.service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.myweb.www.domain.BoardDTO;
+import com.myweb.www.domain.BoardVO;
+import com.myweb.www.domain.FileVO;
+import com.myweb.www.domain.UserVO;
+import com.myweb.www.repository.BoardDAO;
+import com.myweb.www.repository.FileDAO;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Service
+public class BoardServiceImpl implements BoardService {
+	
+	@Autowired
+	public BoardDAO bdao;
+	
+	@Autowired
+	private FileDAO fdao;
+
+//	@Override
+//	public int register(BoardVO bvo) {
+//		log.info("Board Service Impl");
+//		return bdao.register(bvo);
+//	}
+
+	@Override
+	public List<BoardVO> getAllList() {
+		log.info(" Board getAllList Service Impl");
+		return bdao.getAllList();
+	}
+
+	@Override
+	public BoardVO getDetail(int bno) {
+		log.info(" Board getDetail Service Impl");
+		return bdao.getDetail(bno);
+	}
+
+	@Override
+	public int modify(BoardVO bvo) {
+		log.info(" Board modify Service Impl");
+		return bdao.modify(bvo);
+	}
+
+	@Override
+	public int delete(int bno) {
+		log.info(" Board delete Service Impl");
+		return bdao.delete(bno);
+	}
+
+	@Override
+	public int count(int bno) {
+		log.info(" Board count up Service Impl");
+		return bdao.count(bno);
+	}
+
+	@Override
+	public int register(BoardDTO bdto) {
+	    log.info(" BoardDTO Service Impl");
+	    int isOk = bdao.register(bdto.getBvo()); // bvo 저장
+	    if (bdto.getCombinedList() != null && isOk > 0) {
+	    	int bno = bdao.selectBno();
+	    	
+	    	for (FileVO file : bdto.getCombinedList()) {
+	    		file.setBno(bno);
+	    		log.info("파일 저장: " + file.toString());
+	    	    isOk *= fdao.insertFile(file);
+	    	}
+	    }
+	    return isOk;
+	}
+
+	@Override
+	public List<BoardDTO> getMyBdtoList(String id) {
+		log.info(" Board getMyBdtoList Service Impl");
+		List<BoardVO> bvoList = bdao.getBvoList(id);
+		
+		List<BoardDTO> myBdtoList = new ArrayList<>();
+		
+		for(BoardVO bvo : bvoList) {
+			List<FileVO> fvoList = fdao.getFvoList(bvo.getBno());
+			
+			BoardDTO bdto = new BoardDTO(bvo, fvoList);
+	       
+	        myBdtoList.add(bdto);
+		}
+		return myBdtoList;
+	}
+
+	@Override
+	public BoardDTO getDetailDto(int bno) {
+		log.info(" Board getDetailDto Service Impl");
+		BoardDTO bdto = new BoardDTO();
+		bdto.setBvo(bdao.getDetail(bno));
+		bdto.setCombinedList(fdao.getFvoList(bno));
+		
+		return bdto;
+	}
+
+	@Override
+	public int modifyDTO(UserVO uvo, BoardDTO bdto) {
+		log.info(" Board modifyDTO Service Impl");
+		BoardVO tmpBvo = bdao.getDetail(bdto.getBvo().getBno()); // 해당 글의 게시글 호출
+		if(uvo == null || !uvo.getId().equals(tmpBvo.getWriter())) {
+			return 0;		
+		}
+		int bno = bdto.getBvo().getBno();
+		// 1. 기존 파일 삭제
+	    // fdao.deleteFilesByBno(bno);
+
+	    // 2. 새로운 게시글 정보 업데이트
+		int isOk = bdao.updateBoard(bdto.getBvo());
+		
+		 // 3. 새로운 파일 저장
+		if (bdto.getCombinedList() != null && isOk > 0) {
+	    	
+	    	for (FileVO file : bdto.getCombinedList()) {
+	    		file.setBno(bno);
+	    		log.info("파일 저장: " + file.toString());
+	    	    isOk *= fdao.insertFile(file);
+	    	}
+	    }
+	    return isOk;
+	}
+
+	@Override
+	public int removeFile(String uuid) {
+		log.info(" Board removeFile Service Impl");
+		return fdao.deleteFilesByUuid(uuid);
+	}
+	
+	// searchType
+	@Override
+	public List<BoardDTO> getDetail(String searchType_a, String searchType_b, int pageSize) {
+		log.info(" Board List<BoardDTO> getDetail Service Impl");
+		List<BoardDTO> bdtoList = new ArrayList<>();
+		
+		List<BoardVO> bvoList = bdao.getBvoListByType(searchType_a, searchType_b, pageSize);
+		for(BoardVO bvo : bvoList) {
+			List<FileVO> fvoList = fdao.getFvoList(bvo.getBno());			
+			BoardDTO bdto = new BoardDTO(bvo, fvoList);		       
+	        bdtoList.add(bdto);
+		}
+	
+		return bdtoList;
+	}
+	
+	// searchTypeMore
+	@Override
+	public List<BoardDTO> getDetailMore(String searchType_a, String searchType_b, int pageSize, int page) {
+		log.info(" Board List<BoardDTO> getDetail Service Impl");
+		List<BoardDTO> bdtoList = new ArrayList<>();
+		
+		List<BoardVO> bvoList = bdao.getBvoListByTypeMore(searchType_a, searchType_b, pageSize, page);
+		for(BoardVO bvo : bvoList) {
+			List<FileVO> fvoList = fdao.getFvoList(bvo.getBno());			
+			BoardDTO bdto = new BoardDTO(bvo, fvoList);		       
+	        bdtoList.add(bdto);
+		}
+	
+		return bdtoList;
+	}
+
+	@Override
+	public List<BoardDTO> searchDTOList(String searchKeyword, int pageSize, int page) {
+		log.info(" Board List<BoardDTO> searchDTOList Service Impl");
+		List<BoardDTO> bdtoList = new ArrayList<>();
+		
+		List<BoardVO> bvoList = bdao.getBvoListByKeyword(searchKeyword, pageSize, page);
+		for(BoardVO bvo : bvoList) {
+			List<FileVO> fvoList = fdao.getFvoList(bvo.getBno());			
+			BoardDTO bdto = new BoardDTO(bvo, fvoList);		       
+	        bdtoList.add(bdto);
+		}
+	
+		return bdtoList;
+	}
+
+}

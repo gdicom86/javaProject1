@@ -1,0 +1,25 @@
+// 모달 창
+document.addEventListener('DOMContentLoaded', function() {
+   	var confirmationModal = document.getElementById("confirmationModal");
+	var lvoTrButton = document.getElementById("lvoTr");
+	var closeButton = document.getElementById("close-button");
+	var cancelAction = document.getElementById("cancelAction");
+	
+	lvoTrButton.addEventListener('click', function() {
+	    confirmationModal.style.display = "block";
+	});
+	
+	closeButton.addEventListener('click', function() {
+	    confirmationModal.style.display = "none";
+	});
+	
+	cancelAction.addEventListener('click', function() {
+	    confirmationModal.style.display = "none";
+	});
+	
+	window.addEventListener('click', function(event) {
+	    if (event.target === confirmationModal) {
+	        confirmationModal.style.display = "none";
+	    }
+	});
+});

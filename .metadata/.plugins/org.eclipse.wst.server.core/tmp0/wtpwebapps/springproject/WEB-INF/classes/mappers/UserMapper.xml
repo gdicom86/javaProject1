@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myweb.www.repository.UserDAO">
+	<insert id="signUp">
+		insert into user(id, pw, name, address_postcode, address_primary, address_detail, phone, email, customerType)
+		values(#{id}, #{pw}, #{name}, #{address_postcode}, #{address_primary}, #{address_detail}, #{phone}, #{email}, #{customerType})
+	</insert>
+	<!-- 아이디 중복 체크 -->
+	<select id="idCheck" parameterType="String" resultType="int">
+	    select count(*) from user where id=#{id}
+	</select>
+	<select id="getUser" resultType="com.myweb.www.domain.UserVO">
+		select * from user where id=#{id}
+	</select>
+	<!-- 아이디 찾기 -->
+	<select id="searchId" resultType="String">
+    	SELECT id FROM user WHERE name = #{name} AND phone = #{phone}
+	</select>
+	<!-- 아이디, 메일 확인 -->
+	<select id="searchPw" resultType="int">
+		select count(*) from user where id=#{id} and email=#{email}
+	</select>
+	<!-- 비밀번호 업데이트 -->
+	<update id="updatePw">
+		update user set pw = #{encodePw} where id=#{id} and email=#{email}
+	</update>
+	<!-- 계정 해지 -->
+	<delete id="closeAccount">
+		delete from user where id=#{userId}
+	</delete>
+	<!-- 정보 수정 -->
+	<update id="editAccount">
+		update user set pw=#{pw}, address_postcode=#{address_postcode}, address_primary=#{address_primary}, address_detail=#{address_detail}, phone=#{phone} where id=#{id}
+	</update>
+	<!-- 등업 -->
+	<update id="updateCustomerType">
+		UPDATE user SET customerType = "second" WHERE id=#{id} AND customerType= "third"
+	</update>
+</mapper>

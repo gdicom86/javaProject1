@@ -1,0 +1,187 @@
+/* Rotating Text */
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:400);
+
+body {
+  font-family: 'Open Sans', sans-serif; 
+}
+
+.text {
+  position: absolute;
+  width: 450px;
+  left: 50%;
+  margin-left: -230px;
+  height: 40px;
+  margin-top: -80px;
+}
+
+.text p {
+  display: inline-block;
+  font-size: 34px;
+  font-weight: 400;
+  vertical-align: top;
+  margin: 0;
+}
+
+.word {
+  position: absolute;
+  width: 220px;
+  opacity: 0;
+}
+
+.letter {
+  display: inline-block;
+  position: relative;
+  float: left;
+  transform: translateZ(25px);
+  transform-origin: 50% 50% 25px;
+}
+
+.letter.out {
+  transform: rotateX(90deg);
+  transition: transform 0.32s cubic-bezier(0.55, 0.055, 0.675, 0.19);
+}
+
+.letter.behind {
+  transform: rotateX(-90deg);
+}
+
+.letter.in {
+  transform: rotateX(0deg);
+  transition: transform 0.38s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.wisteria {
+  color: #8e44ad;
+}
+
+.belize {
+  color: #2980b9;
+}
+
+.pomegranate {
+  color: #c0392b;
+}
+
+.green {
+  color: #16a085;
+}
+
+.midnight {
+  color: #2c3e50;
+}
+
+/* 기본 스타일 */
+main {
+	max-width: 42rem;
+	width: 42rem;
+	margin: 16rem auto 14rem;
+}
+
+#searchType_aDiv ul,
+#searchType_bDiv ul {
+	padding: 0;
+	display: flex;
+	justify-content: center;
+	list-style: none;
+}
+
+#searchType_aDiv> ul >li,
+#searchType_bDiv> ul >li {
+    margin: 0 5px;
+    text-align: center;
+    
+}
+
+#searchType_aDiv> ul > li > div,
+#searchType_bDiv> ul > li > div {
+	width: 110px;
+	height: 94px;
+}
+
+i {
+	font-size: 40px;
+    margin-bottom: 10px;
+    color: #555;
+}
+
+#areaSpan,
+label {
+	margin-left: 10px;
+}
+
+.error {
+	text-align: center;
+}
+
+#arenaError {
+	margin-left: 10px;
+	margin-top: 4px;
+}
+
+/* 행정도시 select */
+#areaDiv {
+	display: flex;
+	
+}
+
+/* type clicked */
+.type-clicked {
+    background-color: rgba(128, 128, 128, 0.5);
+    padding: 10px;
+    border-radius: 5px;
+    animation: pop 0.6s;
+    margin-top: -10px;
+}
+
+@keyframes pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* 등록 버튼 style */
+.btn-hover {
+    width: 170px;
+    height: 44px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    text-align:center;
+    border: none;
+    background-size: 300% 100%;
+    border-radius: 6px;
+    moz-transition: all .4s ease-in-out;
+    -o-transition: all .4s ease-in-out;
+    -webkit-transition: all .4s ease-in-out;
+    transition: all .4s ease-in-out;
+}
+
+.btn-hover:hover {
+    background-position: 100% 0;
+    moz-transition: all .4s ease-in-out;
+    -o-transition: all .4s ease-in-out;
+    -webkit-transition: all .4s ease-in-out;
+    transition: all .4s ease-in-out;
+}
+
+.btn-hover:focus {
+    outline: none;
+}
+
+.btn-hover.color-1 {
+    background-image: linear-gradient(to right, #29323c, #485563, #2b5876, #4e4376);
+    box-shadow: 0 4px 15px 0 rgba(45, 54, 65, 0.75);
+}
+
+/* file upload style */
+.file-upload-container {
+	display: flex;
+	margin: 1.4rem 0;
+}
+
+#thumbFileDiv,
+#detailFileDiv {
+	width: 50%;
+}
+

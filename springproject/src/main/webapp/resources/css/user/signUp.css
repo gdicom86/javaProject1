@@ -1,0 +1,149 @@
+/* 배경 */
+body {
+  background: url(/resources/image/main.jpg) no-repeat center;
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+/* input number 화살표 삭제 */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* 인풋 컨테이너 위치 & 크기 */
+#signUpContainer,
+#signInContainer {
+	text-align: center;
+	max-width: 37rem;
+	width: 37rem;
+	margin: 14rem auto;
+}
+
+/* 인풋 폼 */
+#signUpContainer form,
+#signInContainer form {
+	padding: 1rem 0;
+	border-radius: 0.5rem;
+	background-color: rgb(249,249,249);
+}
+
+input {
+	height: 3rem;
+	width: 90%;
+	margin-bottom: 14px;
+}
+
+#signUpInput button {
+	cursor: pointer;
+	height: 3rem;
+	width: 92%;
+	background-color: rgb(0,102,51);
+	color: white;
+	font-size: 1.4rem;
+	border: none;
+	border-radius: 4px;
+	margin-top: -14px;
+}
+
+/* 주소 스타일 */
+#addressDiv {
+  display: flex;
+  flex-direction: column;
+}
+
+.horizontal {
+	width: 90%;
+	display: flex;
+	align-items: center;
+	
+}
+
+.horizontal input {
+	width: 20%;
+	height: 1.5rem;
+	margin-left: 1.6rem;
+}
+
+.vertical {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.vertical input {
+	width: 90%;
+  	height: 1.5rem;
+}
+
+/* 전화번호 스타일*/
+#phoneDiv {
+ 	display: flex;
+ 	height: 1.5rem;
+ 	margin-left: 1.6rem;
+ 	margin-bottom: 14px;	
+}
+
+#phoneDiv input {
+	height: 1.14rem;
+	width: 22%;
+}
+
+/* 이메일 스타일 */
+#emailSendDiv {
+	display: flex;
+	margin-left: 1.6rem;
+	align-items: center;	
+}
+
+#email {
+	width: 70%;
+	height: 2rem;
+}
+
+#emailButton {
+	margin-left: 0.6rem;
+	width: 22%;
+	height: 2rem;
+}
+
+#codeInput {
+	height: 2rem;
+}
+
+/* 폰트 스타일 */
+h2 {
+	color: white;
+}
+
+/* 경계선 */
+.hrDiv {
+	margin: 2rem 0;
+}
+
+/* 아이디 중복체크 */
+.id_ok,
+.pw_ok,
+.pw_confirm_ok,
+.code_ok {
+	color: rgb(1,113,67);
+	display: none;
+	margin-top: -4px;
+	margin-bottom: 10px;
+}
+
+.id_already,
+.id_error,
+.pw_error,
+.pw_confirm_error,
+.name_error,
+.address_error,
+.code_error,
+.phone_error,
+.email_error {
+	color: rgb(238,35,35); 
+	display: none;
+	margin-top: -4px;
+	margin-bottom: 10px;
+}

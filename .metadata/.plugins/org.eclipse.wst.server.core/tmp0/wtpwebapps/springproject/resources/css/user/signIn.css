@@ -1,0 +1,78 @@
+#signInInput button {
+	cursor: pointer;
+	height: 3rem;
+	width: 92%;
+	background-color: rgb(0,102,51);
+	color: white;
+	font-size: 1.4rem;
+	border: none;
+	border-radius: 4px;
+}
+
+.signIn_error {
+	color: rgb(238,35,35);
+	margin-top: 2px;
+	margin-bottom: 14px;
+}
+
+.notice {
+	color: rgb(0,102,51);
+	margin: 1rem 0;
+	font-size: 14px;
+	line-height: 1.4;
+	font-weight: 500;
+}
+
+/* signInMenu 링크 스타일 */
+#signInMenu {
+	display: flex;
+	justify-content: space-around;
+	list-style: none;
+	margin-top: 2.5rem !important;
+	padding: 0 2rem;
+}
+
+#signInMenu li {
+	margin-left: 24px;
+	position: relative;
+}
+
+#signInMenu li:first-child a::after,
+#signInMenu li:nth-child(2) a::after {
+	border-right: 1px solid #ddd;
+	color: #666;
+	content: "";
+	height: 22px;
+	margin-top: -8px;
+	position: absolute;
+	top: 50%;
+	right: -50px;
+} 
+
+/* button style */
+#naver_id_login {
+	margin-top: 4px;
+	margin-right: 20px;
+}
+
+#kakao_id_login {
+	margin-top: 4px;
+}
+
+#naver_id_login img {
+	width: 140px; 
+	height: 42px;
+	transition: all 0.3s ease 0s;
+}
+
+#kakao_id_login img {
+	width: 146px; 
+	height: 43px;
+	transition: all 0.3s ease 0s;
+}
+
+#naver_id_login img:hover,
+#kakao_id_login img:hover {
+	-webkit-box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
+	-moz-box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
+}

@@ -1,0 +1,89 @@
+// 개인정보 수집 동의 확인
+document.getElementById("registerForm").addEventListener("submit", function(e) {
+    var checkbox = document.querySelector('input[type="checkbox"]');
+    if (!checkbox.checked) {
+        e.preventDefault();
+        alert("개인정보 수집에 동의해야 합니다.");
+    }
+});
+
+// 개인정보 수집 정보 모달 창
+var policyModal = document.getElementById("policy-modal");
+var policyButton = document.getElementById("privacy-policy");
+var closeButton = document.getElementById("close-button-policy");
+
+var policyModal1 = document.getElementById("policy-modal1");
+var policyButton1 = document.getElementById("privacy-policy1");
+var closeButton1 = document.getElementById("close-button-policy1");
+
+policyButton.onclick = function() {
+    policyModal.style.display = "block";
+}
+
+closeButton.onclick = function() {
+    policyModal.style.display = "none";
+}
+
+policyButton1.onclick = function() {
+    policyModal1.style.display = "block";
+}
+
+closeButton1.onclick = function() {
+    policyModal1.style.display = "none";
+}
+
+window.onclick = function(event) {
+    if (event.target == policyModal) {
+        policyModal.style.display = "none";
+    }
+    if (event.target == policyModal1) {
+        policyModal1.style.display = "none";
+    }
+}
+
+// 폼 전송 방지
+function validateButton(event) {
+    var phone = document.querySelector('input[name="phone"]');
+    var phoneError = document.getElementById("phoneError");
+    
+    var businessNumber = document.querySelector('input[name="businessNumber"]');
+    var businessNumberError = document.getElementById("businessNumberError");
+
+    var contentTextarea = document.querySelector('textarea[name="content"]');
+    var contentError = document.getElementById("contentError");
+
+    var isFormValid = true;
+
+    if (phone.value.trim() !== "") {
+        phoneError.style.display = "none";
+    } else {
+        isFormValid = false;
+        phoneError.style.display = "block";
+    }
+
+    if (businessNumber.value.trim() !== "") {
+        businessNumberError.style.display = "none";
+    } else {
+        isFormValid = false;
+        businessNumberError.style.display = "block";
+    }
+
+    if (searchTypeAdd1.value.trim() !== "") {
+        arenaError.style.display = "none";
+    } else {
+        isFormValid = false;
+        arenaError.style.display = "block";
+    }
+
+    if (contentTextarea.value.trim() !== "") {
+        contentError.style.display = "none";
+    } else {
+        isFormValid = false;
+        contentError.style.display = "block";
+    }
+
+    console.log(isFormValid);
+    if (!isFormValid) {
+        event.preventDefault();
+    }
+}

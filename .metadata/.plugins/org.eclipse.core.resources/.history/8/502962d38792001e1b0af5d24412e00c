@@ -1,0 +1,61 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>${pageTitle }</title>
+<!-- CSS import -->
+<link rel="stylesheet" href="/resources/css/navigation.css">
+<link rel="stylesheet" href="/resources/css/footer.css">
+<link rel="stylesheet" href="/resources/css/user/signUp.css">
+<link rel="stylesheet" href="/resources/css/user/signIn.css">
+<script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+<!-- JS import -->
+<script src="https://kit.fontawesome.com/e927512ef5.js" crossorigin="anonymous"></script>
+<script defer type="text/javascript" src="/resources/js/navigation.js"></script>
+</head>
+<body>
+	<!-- navigation -->
+	<jsp:include page="../layouts/navigation.jsp"></jsp:include>
+	<img class="blurEffect">
+	<div id="signInContainer">
+		<h2>로그인</h2>
+		<div id="signInInput">
+			<form action="/user/signIn" method="post">
+					<p style="color: rgb(0,102,51); font-weight: bold;">Welcome!</p>
+					<p style="color: rgb(190,190,205); font-weight: bold;">부동산 코리아에 오신 것을 환영합니다.</p>
+					<div class="hrDiv">
+						<hr>
+					</div>			
+					<input type="text" name="id" placeholder="아이디를 입력해 주세요.">
+					<input type="password" name="pw" placeholder="비밀번호를 입력해 주세요."> <br>
+					<c:if test="${ msg_signIn == 0 }"><p class="signIn_error">아이디나 비밀번호를 다시 확인해 주세요.</p></c:if>
+					<button type="submit">로그인</button>
+					<p class="notice">* 타 사이트와 비밀번호를 동일하게 사용할 경우 도용의 위험이 있으므로<br> 정기적인 비밀번호 변경을 해주시길 바랍니다.</p>
+					<p class="notice">* 부동산 코리아의 공식 홈페이지는 Internet Explorer 9.0 이상<br> Chrome, Firefox, Safari 브라우저에 최적화 되어있습니다.</p>
+					<div>
+						<ul id="signInMenu">
+							<li>
+								<a href="/user/signUp">회원가입 </a>
+							</li>
+							<li>
+								<a href="/user/searchId">아이디 찾기 </a>
+							</li>
+							<li>
+								<a href="/user/searchPw">비밀번호 찾기 </a>
+							</li>
+						</ul>					
+					</div>
+					<div style="display: flex; text-align: center; justify-content: center; margin-top: 18px;">
+						<!-- 네이버 로그인 화면으로 이동 시키는 URL -->
+						<!-- 네이버 로그인 화면에서 ID, PW를 올바르게 입력하면 callback 메소드 실행 요청 -->
+						<div id="naver_id_login"><a href="${urlNaver}"><img src="/resources/image/naver_Bn_Green.png"/></a></div>
+						<div id="kakao_id_login"><a href="${urlKakao}"><img src="/resources/image/kakao_login_medium_narrow.png"/></a></div>					
+					</div>
+			</form>
+		</div>
+	</div>
+	<!-- footer -->
+	<jsp:include page="../layouts/footer.jsp"></jsp:include>

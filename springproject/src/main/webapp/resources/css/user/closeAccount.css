@@ -1,0 +1,50 @@
+body {
+	background-color: rgb(245,245,245);
+}
+
+footer {
+	position: absolute;
+	bottom: 0px;
+	left: 0px;
+}
+
+#mainDiv {
+	width: 50rem;
+	max-width: 50rem;
+	margin: 18rem auto;
+	border-radius: 4px;
+	background-color: white;
+	padding: 2rem 2rem;
+}
+
+i {
+	color: rgb(248,179,78);
+	font-size: 1.2rem;
+}
+
+#consentInfo {
+	padding: 2px 12px;
+	border-radius: 8px;
+	background-color: rgb(248,179,78); 
+	margin-bottom: 1rem;
+}
+
+#consentInfo > div {
+	background-color: white;
+	padding: 1rem 1rem;
+}
+
+span {
+	text-align: center;
+}
+
+#consentInfo > div > span:nth-of-type(1) {
+	font-size: 1.1rem;
+	font-weight: 900;
+}
+
+#consentBtn {
+	margin-top: 0.8rem;
+	margin-left: 2px;
+	padding: 3px 8px;
+}

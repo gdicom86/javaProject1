@@ -1,0 +1,235 @@
+package com.myweb.www.controller;
+
+import java.util.Random;
+
+import javax.inject.Inject;
+import javax.mail.internet.MimeMessage;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.myweb.www.domain.UserVO;
+import com.myweb.www.service.UserService;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@RequestMapping("/user/*")
+@Controller
+public class UserController {
+	
+	@Autowired
+	private JavaMailSender mailSender;
+	
+	@Inject
+	private UserService usv;
+	
+	@GetMapping("/signUp")
+	public String signUpGet(Model m) {
+		String pageTitle = "Sign Up";
+		m.addAttribute("pageTitle", pageTitle);
+		return "/user/signUp";
+	}
+	
+	@PostMapping("/signUp")
+	public String signUpPost(Model m, UserVO uvo) {
+		log.info("Sign Up Post 접근");
+		log.info(uvo.toString());
+		int isOk = usv.signUp(uvo);
+		if(isOk > 0) {
+			m.addAttribute("msg_signUp", 1);
+		} else {
+			m.addAttribute("msg_signUp", 0);
+		}
+		String pageTitle = "Welcome to my world";
+		m.addAttribute("pageTitle", pageTitle);
+		return "home";
+	}
+	
+	@PostMapping("/idCheck")
+	@ResponseBody
+	public String idCheck(@RequestParam("id") String id) {
+		String result = "N";
+		int cnt = usv.idCheck(id);	
+		if(cnt == 1) result ="Y";
+		return result;
+	}
+	
+	@GetMapping("/mailSender")
+	@ResponseBody
+	public String mailSending(String email) {
+		// 뷰에서 넘어왔는지 확인
+		System.out.println("이메일 전송");
+		
+		// 난수 생성(인증번호)
+		Random r = new Random();
+		int num = r.nextInt(888888) + 111111;  //111111 ~ 999999
+		System.out.println("인증번호:" + num);
+		
+		// 이메일 보내기
+		String setFrom = "gdicom86@gmail.com"; //보내는 이메일
+        String toMail = email; //받는 사람 이메일
+        String title = "회원가입 인증 이메일 입니다.";
+        String content = 
+                "부동산 코리아 홈페이지를 방문해주셔서 감사합니다." +
+                "<br><br>" + 
+                "인증 번호는 " + num + "입니다." + 
+                "<br>" + 
+                "해당 인증번호를 인증번호 확인란에 기입하여 주세요.";
+        
+        try {            
+	        MimeMessage message = mailSender.createMimeMessage();
+	        MimeMessageHelper helper = new MimeMessageHelper(message, true, "utf-8");
+	        helper.setFrom(setFrom);
+	        helper.setTo(toMail);
+	        helper.setSubject(title);
+	        helper.setText(content,true);
+	        mailSender.send(message);            
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        
+        String rnum = Integer.toString(num);  //view로 다시 반환할 때 String만 가능
+        
+        return rnum;
+	}
+	
+	@GetMapping("/signIn")
+	public String signInGet(Model m) {
+		String pageTitle = "Sign In";
+		m.addAttribute("pageTitle", pageTitle);
+
+		return "/user/signIn";
+	}
+	
+	@PostMapping("/signIn")
+	public String signInPost(Model m, UserVO uvo, HttpServletRequest req) {
+		// session을 이용하려면 HttpServletRequest이 필요하다.
+		// method post -> mapping될 때 jsp에서 가져온 param 사용 가능
+		String id = req.getParameter("id");
+		String pw = req.getParameter("pw");
+		// HttpServletRequest를 이용해 가져온 param(id, pw)를
+		// Database에 넘겨 일치하는 객체를 받는다. 
+		UserVO existUser = usv.existUser(id, pw);
+		
+		// DB -> serviceImpl에서 얻은 객체가 null이 아니라면 session set
+		if(existUser != null) {
+			HttpSession ses = req.getSession();
+			ses.setAttribute("ses", existUser); // session에 uvo객체 담기
+			ses.setMaxInactiveInterval(60*10); // 로그인 유지시간
+		} else {
+			m.addAttribute("msg_signIn", 0);
+			String pageTitle = "Sign In";
+			m.addAttribute("pageTitle", pageTitle);
+			return "/user/signIn";
+		}
+		String pageTitle = "Welcome to my world";
+		m.addAttribute("pageTitle", pageTitle);
+		return "home";
+	}
+	
+	@GetMapping("/signOut")
+	public String signOut(Model m, HttpServletRequest req) {
+		req.getSession().removeAttribute("ses"); // ses.setAttribute("ses", existUser); 삭제
+		req.getSession().invalidate(); // 세션 끊기
+		String pageTitle = "Welcome to my world";
+		m.addAttribute("pageTitle", pageTitle);
+		return "home";
+	}
+	
+	@GetMapping("/searchId")
+	public String searchIdGet(Model m) {
+		String pageTitle = "아이디 찾기";
+		m.addAttribute("pageTitle", pageTitle);
+		return "/user/searchId";
+	}
+	
+	@PostMapping("/searchId")
+	@ResponseBody
+	public String searchIdPost(Model m, String name, String phone) {
+		System.out.println("name: " + name);
+		System.out.println("phone: " + phone);
+		
+		String searchedId = usv.searchId(name, phone);
+		
+		System.out.println("searchedId: " + searchedId);
+		
+		String pageTitle = "아이디 찾기";
+		m.addAttribute("pageTitle", pageTitle);
+		
+		return searchedId;
+	}
+	
+	@GetMapping("/searchPw")
+	public String searchPwGet(Model m) {
+		String pageTitle = "비밀번호 찾기";
+		m.addAttribute("pageTitle", pageTitle);
+		return "/user/searchPw";
+	}
+	
+	@PostMapping("/searchPw")
+	@ResponseBody
+	public String searchPwPost(Model m, String id, String email) {
+		System.out.println("id: " + id);
+		System.out.println("email: " + email);
+		
+		String result = "Y";
+		
+		int isOk = usv.searchPw(id, email);
+		System.out.println("isOk: " + isOk);
+		
+		// 여기서 isOk가 1이면 이메일 전송 -> js에 리턴 'Y'
+		// isOk가 0이면 이메일 전송 X -> js에 리턴 'N'
+		if (isOk == 0) {
+			result = "N";
+		} else {
+			// 비밀번호 생성 -> uvo.set으로 비밀번호 저장 -> 비밀번호 이메일 전송
+			// 비밀번호 생성
+			Random r = new Random();
+			int num = r.nextInt(888888) + 111111;  //111111 ~ 999999
+			String key = Integer.toString(num);
+			System.out.println("새 비밀번호: " + key);
+			
+			// 이메일 보내기
+			String setFrom = "gdicom86@gmail.com"; //보내는 이메일
+	        String toMail = email; //받는 사람 이메일
+	        String title = "회원가입 인증 이메일 입니다.";
+	        String content = 
+	                "부동산 코리아 홈페이지를 방문해주셔서 감사합니다." +
+	                "<br><br>" + 
+	                "인증 번호는 " + num + "입니다." + 
+	                "<br>" + 
+	                "해당 인증번호를 인증번호 확인란에 기입하여 주세요.";
+	        
+	        try {            
+		        MimeMessage message = mailSender.createMimeMessage();
+		        MimeMessageHelper helper = new MimeMessageHelper(message, true, "utf-8");
+		        helper.setFrom(setFrom);
+		        helper.setTo(toMail);
+		        helper.setSubject(title);
+		        helper.setText(content,true);
+		        mailSender.send(message);            
+	        } catch(Exception e) {
+	            e.printStackTrace();
+	        }
+			
+		}
+		
+		String pageTitle = "비밀번호 찾기";
+		m.addAttribute("pageTitle", pageTitle);
+			
+		
+		return result;
+	}
+
+}
